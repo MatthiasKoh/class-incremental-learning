@@ -19,7 +19,7 @@ def validate(model, dataset, feature_extractor=None, batch_size=128, test_size=1
                             (these "active classes" are assumed to be contiguous)'''
 
     # Get device-type / using cuda?
-    device = model.device if hasattr(model, 'device') else model._device()
+    device = model.device if hasattr(model, 'device') else model._device() #has attribute
     cuda = model.cuda if hasattr(model, 'cuda') else model._is_on_cuda()
 
     # If not provided, set [allowed_classes]
