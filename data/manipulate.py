@@ -1,6 +1,7 @@
 import torch
 from torch.utils.data import Dataset
 
+#CREATE DATASET CLASSES
 
 class FeatureDataset(Dataset):
     def __init__(self, input_tensors, label):
@@ -33,7 +34,7 @@ class CustomDataset(Dataset):
 
 
 class ReducedDataset(Dataset):
-    '''To reduce a dataset, taking only samples corresponding to provided indeces.
+    '''To reduce a dataset, taking only samples corresponding to provided indices.
     This is useful for splitting a dataset into a training and validation set.'''
 
     def __init__(self, original_dataset, indeces):
@@ -49,7 +50,7 @@ class ReducedDataset(Dataset):
 
 
 class SubDataset(Dataset):
-    '''To sub-sample a dataset, taking only those samples with label in [sub_labels].
+    '''To sub-sample a dataset, taking only those samples with label in [sub_labels]. eg labels of class 2 and 3
 
     After this selection of samples has been made, it is possible to transform the target-labels,
     which can be useful when doing continual learning with fixed number of output units.'''
@@ -59,15 +60,15 @@ class SubDataset(Dataset):
         self.dataset = original_dataset
         self.sub_indeces = []
         for index in range(len(self.dataset)):
-            if hasattr(original_dataset, "targets"):
+            if hasattr(original_dataset, "targets"): #The hasattr() function returns True if the specified object has the specified attribute, otherwise False .
                 if self.dataset.target_transform is None:
                     label = self.dataset.targets[index]
                 else:
-                    label = self.dataset.target_transform(self.dataset.targets[index])
+                    label = self.dataset.target_transform(self.dataset.targets[index]) #you can see that transform and target_transform are used to modify / augment / transform the image and the target respectively.
             else:
                 label = self.dataset[index][1]
             if label in sub_labels:
-                self.sub_indeces.append(index)
+                self.sub_indeces.append(index) #append to list if labels is the ones we want
         self.target_transform = target_transform
 
     def __len__(self):
