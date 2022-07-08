@@ -58,15 +58,15 @@ def get_experiment(name, tasks=1, data_dir="./store/datasets", normalize=False, 
         raise ValueError('Given undefined experiment: {}'.format(name))
 
     # Get config-dict
-    config = DATASET_CONFIGS[data_type].copy()
-    config['normalize'] = normalize
+    config = DATASET_CONFIGS[data_type].copy() #Dataset_configs gives configuration of dataset eg 'cifar10': {'size': 32, 'channels': 3, 'classes': 10},
+    config['normalize'] = normalize            #if depends if normalise is true of false then will have diff transformations
     if normalize:
         config['denormalize'] = AVAILABLE_TRANSFORMS[data_type+"_denorm"]
     # check for number of tasks
-    if tasks > config['classes']:
+    if tasks > config['classes']:              #Tasks cannot be greater than num of classes in the dataset
         raise ValueError("Experiment '{}' cannot have more than {} tasks!".format(name, config['classes']))
     # -how many classes per epoch?
-    if not per_class:
+    if not per_class:                          #If it is not be class but instead per task then how many classes per task
         classes_per_task = int(np.floor(config['classes'] / tasks))
         config['classes'] = classes_per_task * tasks
         config['classes_per_task'] = classes_per_task
@@ -79,7 +79,7 @@ def get_experiment(name, tasks=1, data_dir="./store/datasets", normalize=False, 
     permuted_class_list = np.array(list(range(classes))) if exception else np.random.permutation(list(range(classes)))
 
     # Load train and test datasets with all classes
-    if not name in ("CORe50"):
+    if not name in ("CORe50"):                      #for all other datasets apart from CORe50                      
         target_transform = transforms.Lambda(lambda y, p=permuted_class_list: int(p[y]))
         trainset = get_dataset(data_type, type="train", dir=data_dir, target_transform=target_transform,
                                normalize=normalize, augment=augment, verbose=verbose)
@@ -93,7 +93,7 @@ def get_experiment(name, tasks=1, data_dir="./store/datasets", normalize=False, 
     train_datasets = []
     test_datasets = []
     for labels in labels_per_task:
-        if name in ("CORe50"):
+        if name in ("CORe50"):        #only for CORe50
             # -training data
             class_datasets = []
             for label in labels:
@@ -120,7 +120,7 @@ def get_experiment(name, tasks=1, data_dir="./store/datasets", normalize=False, 
                 class_datasets.append(ConcatDataset(object_datasets))
             task_dataset = ConcatDataset(class_datasets)
             test_datasets.append(task_dataset)
-        else:
+        else:                  #for all other datasets
             train_datasets.append(SubDataset(trainset, labels, target_transform=None))
             test_datasets.append(SubDataset(testset, labels, target_transform=None))
 
